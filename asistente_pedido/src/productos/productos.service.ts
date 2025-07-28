@@ -1,26 +1,75 @@
-import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+
+import { Producto } from './entities/producto.entity';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 
 @Injectable()
 export class ProductosService {
-  create(createProductoDto: CreateProductoDto) {
-    return 'This action adds a new producto';
+  private readonly logger = new Logger('ProductosService');
+
+  constructor(
+    @InjectRepository(Producto)
+    private readonly producteRepository: Repository<Producto>,
+  ) {}
+
+  async create(createProductoDto: CreateProductoDto) {
+    try {
+      const product = this.producteRepository.create(createProductoDto);
+      await this.producteRepository.save(product);
+      return product;
+    } catch (error) {
+      console.log(error);
+      this.errorHandler(error);
+    }
   }
 
-  findAll() {
-    return `This action returns all productos`;
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
+    const products = await this.producteRepository.find({
+      take: limit,
+      skip: offset,
+    });
+    return products;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} producto`;
+  async findOne(id: number) {
+    let product: Producto | null = null;
+
+    product = await this.producteRepository.findOneBy({ id: id });
+    if (!product) {
+      throw new NotFoundException(`product with ${id} not found`);
+    }
+    return product;
   }
 
-  update(id: number, updateProductoDto: UpdateProductoDto) {
-    return `This action updates a #${id} producto`;
+  async update(id: number, updateProductoDto: UpdateProductoDto) {
+   return 'product  was actialized'
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} producto`;
+  async remove(id: number) {
+    
+    return 'product was remove '
+  }
+
+  private errorHandler(error: any) {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+    this.logger.error(error);
+    throw new InternalServerErrorException(
+      'unexpected error check server logs!',
+    );
   }
 }

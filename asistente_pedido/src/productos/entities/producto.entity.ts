@@ -1,11 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { PedidoXProducto } from 'src/pedido_x_producto/entities/pedido_x_producto.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'comidas' })
 export class Producto {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text')
+  @Column('text',{
+    unique: true,
+  })
   nombre: string;
 
   @Column('text', {
@@ -27,4 +30,9 @@ export class Producto {
     array: true,
   })
   categorias: string[];
+
+  @OneToMany(
+    () =>PedidoXProducto,
+    (pedidoProducto) => pedidoProducto.producto)
+    pedidoProductos : PedidoXProducto[]
 }
