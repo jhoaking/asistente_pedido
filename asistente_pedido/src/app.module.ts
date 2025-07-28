@@ -25,7 +25,7 @@ import { PedidoXProductoModule } from './pedido_x_producto/pedido_x_producto.mod
     CommonModule,
     PedidosModule,
     UsersModule,
-    PedidoXProductoModule,
+    PedidoXProductoModule, // este no contendra nada pero como es una tabla intermedia se queda
  
 
   ],
