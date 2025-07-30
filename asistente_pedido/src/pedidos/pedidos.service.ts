@@ -111,14 +111,14 @@ export class PedidosService {
       usuario: pedido.usuario?.nombre ?? 'Usuario desconocido',
       pedidoProductos: pedido.pedidoProductos
         .filter((pedi) => pedi.producto)
-        .map((pedi) => pedi.producto.nombre),
+        .map((pedi) => ({
+          nombre: pedi.producto.nombre,
+          cantidad: pedi.cantidad,
+        })),
     }));
   }
 
   async findOne(id: number) {
-
-  
-    
     const pedido = await this.pedidoRepository.findOne({
       where: { id },
       relations: {
@@ -138,8 +138,11 @@ export class PedidosService {
 
     return {
       ...rest,
-      usuario: usuario.nombre ,
-      pedidoProductos: pedidoProductos.map((pedi) => pedi.producto.nombre),
+      usuario: usuario.nombre,
+      pedidoProductos: pedidoProductos.map((pedi) => ({
+        nombre: pedi.producto.nombre,
+        cantidad: pedi.cantidad,
+      })),
     };
   }
 
@@ -193,17 +196,15 @@ export class PedidosService {
         nuevoPedidoXProducto.push(newPedidoXProducto);
       }
 
-      const pedidoActualizado = this.pedidoRepository.create({
-        ...restToUpdate,
-        pedidoProductos: await queryRunner.manager.save(nuevoPedidoXProducto),
-        precioTotal: nuevoPrecio,
-        fecha_pedido: new Date(),
-      });
+      pedido.pedidoProductos =
+        await queryRunner.manager.save(nuevoPedidoXProducto);
+      pedido.precioTotal = nuevoPrecio;
+      pedido.fecha_pedido = new Date();
 
-      await queryRunner.manager.save(pedidoActualizado);
+      await queryRunner.manager.save(pedido);
 
       await queryRunner.commitTransaction();
-      return pedidoActualizado;
+      return pedido;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();

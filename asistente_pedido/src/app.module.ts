@@ -6,6 +6,7 @@ import { CommonModule } from './common/common.module';
 import { PedidosModule } from './pedidos/pedidos.module';
 import { UsersModule } from './users/users.module';
 import { PedidoXProductoModule } from './pedido_x_producto/pedido_x_producto.module';
+import { SeedModule } from './seed/seed.module';
 
 
 @Module({
@@ -25,7 +26,8 @@ import { PedidoXProductoModule } from './pedido_x_producto/pedido_x_producto.mod
     CommonModule,
     PedidosModule,
     UsersModule,
-    PedidoXProductoModule, // este no contendra nada pero como es una tabla intermedia se queda
+    PedidoXProductoModule,
+    SeedModule, // este no contendra nada pero como es una tabla intermedia se queda
  
 
   ],

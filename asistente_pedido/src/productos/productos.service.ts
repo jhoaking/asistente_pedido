@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 
 import { Producto } from './entities/producto.entity';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 
@@ -63,6 +63,8 @@ export class ProductosService {
     return 'product was remove '
   }
 
+ 
+
   private errorHandler(error: any) {
     if (error.code === '23505') {
       throw new BadRequestException(error.detail);
@@ -71,5 +73,14 @@ export class ProductosService {
     throw new InternalServerErrorException(
       'unexpected error check server logs!',
     );
+  }
+   async deleteAllProducts(){
+    const query =  this.producteRepository.createQueryBuilder('prod');
+
+      try {
+      return await query.delete().where({}).execute();
+    } catch (error) {
+      this.errorHandler(error);
+    }
   }
 }
